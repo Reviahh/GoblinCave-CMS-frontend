@@ -1,3 +1,0 @@
-# GoblinCave-CMS-frontend
-
-dashabi
