@@ -7,7 +7,6 @@
           <el-button type="success" size="large" @click="startButton2" style="margin-left: 20px;">报名管理</el-button>
         </div>
       </div>
-      <template>
         <!-- 顶部大图和按钮 -->
         <div class="module-header">
           <div class="module-header-container">
@@ -144,106 +143,10 @@
                     <el-tag :type="member.tagType" size="small" effect="plain">{{ member.tag }}</el-tag>
                   </div>
                 </div>
-              <!-- 多余的 </el-col> 和 </div> 已移除 -->
+              </el-col>
             </el-row>
           </el-card>
         </div>
-
-            <p>手工统计、线下报名等方式效率低，易出错，难以满足现代需求</p>
-          </div>
-        </el-col>
-        <el-col :xs="24" :sm="8">
-          <div class="background-item">
-            <img src="" class="background-image" alt="政策支持">
-            <h3>信息化建设推进</h3>
-            <p>政策鼓励教育信息化，推动竞赛管理系统化、智能化发展</p>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-  </div>
-
-  <!-- 第二部分：系统优势 -->
-  <div id="section2" class="py-16">
-    <el-card shadow="hover">
-      <h2 class="section-title">系统优势</h2>
-      <el-row :gutter="24">
-        <el-col :xs="24" :sm="12">
-          <div class="advantage-item">
-            <img src="" class="advantage-image" alt="高效管理" />
-            <h3>高效管理</h3>
-            <ul>
-              <li>一站式竞赛全流程管理</li>
-              <li>自动统计与数据分析</li>
-              <li>权限分级，安全可靠</li>
-            </ul>
-          </div>
-        </el-col>
-        <el-col :xs="24" :sm="12">
-          <div class="advantage-item">
-            <img src="" class="advantage-image" alt="智能便捷" />
-            <h3>智能便捷</h3>
-            <ul>
-              <li>在线报名与审核</li>
-              <li>成绩自动发布与查询</li>
-              <li>支持多终端访问</li>
-            </ul>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-  </div>
-
-  <!-- 第三部分：系统涵盖功能 -->
-  <div id="section3" class="py-16">
-    <el-card shadow="hover">
-      <h2 class="section-title">系统涵盖功能</h2>
-      <el-row :gutter="24">
-        <el-col :xs="24" :sm="8">
-          <div class="feature-item">
-            <img src="" class="feature-image" alt="竞赛发布" />
-            <h3>竞赛发布</h3>
-            <p>支持多类型竞赛的发布与信息维护</p>
-          </div>
-        </el-col>
-        <el-col :xs="24" :sm="8">
-          <div class="feature-item">
-            <img src="" class="feature-image" alt="报名管理" />
-            <h3>报名管理</h3>
-            <p>在线报名、审核、名单导出等功能一应俱全</p>
-          </div>
-        </el-col>
-        <el-col :xs="24" :sm="8">
-          <div class="feature-item">
-            <img src="" class="feature-image" alt="成绩管理" />
-            <h3>成绩管理</h3>
-            <p>成绩录入、自动统计、结果发布与查询</p>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-  </div>
-
-  <!-- 第四部分：项目团队 -->
-  <div id="section4" class="py-16">
-    <el-card shadow="hover">
-      <h2 class="section-title">项目团队</h2>
-      <el-row :gutter="24">
-        <el-col v-for="(member, index) in teamMembers" :key="index" :xs="24" :sm="8" :md="4">
-          <div class="team-member">
-            <el-avatar :src="getGithubAvatar(member.github)" :size="80" style="margin-bottom: 12px;" />
-            <div class="text-center">
-              <h3 style="font-size: 18px; font-weight: bold;">{{ member.name }}</h3>
-              <p style="font-size: 14px; color: #888; margin: 4px 0;">{{ member.role }}</p>
-              <el-button type="primary" size="small" :href="member.github" target="_blank" link>GitHub</el-button>
-              <p style="font-size: 13px; margin: 4px 0;">{{ member.major }}</p>
-              <el-tag :type="member.tagType" size="small" effect="plain">{{ member.tag }}</el-tag>
-            </div>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-  </div>
 </template>
 
 
