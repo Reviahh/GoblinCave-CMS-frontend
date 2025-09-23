@@ -1,3 +1,16 @@
+<script setup>
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+
+const userStore = useUserStore()
+const router = useRouter()
+
+function handleLogout() {
+  userStore.logout()
+  router.push('/login')
+}
+</script>
+
 <template>
   <el-header class="topbar">
     <div class="logo">哥布林大学</div>
@@ -16,6 +29,19 @@
         <el-menu-item index="/courses">课程管理</el-menu-item>
         <el-menu-item index="/about">关于我们</el-menu-item>
       </el-menu>
+    </div>
+    <div class="auth">
+      <template v-if="!userStore.isLoggedIn">
+        <el-button type="primary" size="small" @click="$router.push('/login')">
+          登录
+        </el-button>
+      </template>
+      <template v-else>
+        <span class="welcome">欢迎，{{ userStore.username }}</span>
+        <el-button type="danger" size="small" @click="handleLogout">
+          退出
+        </el-button>
+      </template>
     </div>
   </el-header>
 </template>
@@ -39,7 +65,14 @@
 
 .nav-links {
   flex: 1;
-  display: flex;
-  justify-content: flex-end;
+}
+
+.auth {
+  padding-right: 20px;
+}
+
+.welcome {
+  margin-right: 10px;
+  color: #fff;
 }
 </style>
