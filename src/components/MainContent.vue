@@ -1,12 +1,4 @@
 <template>
-      <div class="module-header-content">
-        <div class="module-header-title">竞赛管理系统</div>
-        <div class="module-header-info">基于现代 Web 技术的竞赛管理平台，支持竞赛发布、报名、成绩管理等功能</div>
-        <div class="module-header-link">
-          <el-button type="primary" size="large" @click="startButton1">进入竞赛列表</el-button>
-          <el-button type="success" size="large" @click="startButton2" style="margin-left: 20px;">报名管理</el-button>
-        </div>
-      </div>
         <!-- 顶部大图和按钮 -->
         <div class="module-header">
           <div class="module-header-container">
