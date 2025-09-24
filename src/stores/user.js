@@ -1,23 +1,32 @@
-// src/stores/user.js
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
-export const useUserStore = defineStore('user', () => {
-    const username = ref('')
-    const role = ref('') // admin 或 student
-    const isLoggedIn = ref(false)
-
-    const login = (name, userRole) => {
-        username.value = name
-        role.value = userRole
-        isLoggedIn.value = true
-    }
-
-    const logout = () => {
-        username.value = ''
-        role.value = ''
-        isLoggedIn.value = false
-    }
-
-    return { username, role, isLoggedIn, login, logout }
+export const useUserStore = defineStore('user', {
+    state: () => ({
+        isLoggedIn: false,
+        username: '',
+        role: '',
+        phone: '',
+        password: '',
+        avatar: ''
+    }),
+    actions: {
+        login(username, role) {
+            this.isLoggedIn = true
+            this.username = username
+            this.role = role
+        },
+        logout() {
+            this.isLoggedIn = false
+            this.username = ''
+            this.role = ''
+        },
+        updateProfile(profile) {
+            this.username = profile.username
+            this.phone = profile.phone
+            this.role = profile.role
+            this.password = profile.password
+            this.avatar = profile.avatar
+        }
+    },
+    persist: true // 启用持久化
 })

@@ -85,11 +85,11 @@ const handleLogin = () => {
     loginForm.value.username === 'admin' &&
     loginForm.value.password === '123456'
   ) {
-    userStore.login(loginForm.value.username, 'admin')
+    userStore.login(loginForm.value.username, loginForm.value.role)
     router.push('/admin/users') // 管理员跳后台
   } else if (loginForm.value.username && loginForm.value.password) {
     userStore.login(loginForm.value.username, loginForm.value.role)
-    router.push('/competitions/apply') // 学生跳报名入口
+    router.push('/')
   } else {
     alert('用户名或密码错误！')
   }

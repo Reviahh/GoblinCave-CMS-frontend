@@ -5,6 +5,7 @@ import Competitions from '@/views/Competitions.vue'
 import Courses from '@/views/Courses.vue'
 import About from '@/views/About.vue'
 import Login from '@/views/Login.vue'
+import Profile from '@/views/Profile.vue'
 import { useUserStore } from '@/stores/user'
 
 const routes = [
@@ -14,8 +15,8 @@ const routes = [
   { path: '/courses', component: Courses, meta: { title: '课程管理', requiresAuth: true, role: 'student' } },
   { path: '/about', component: About, meta: { title: '关于我们' } },
   { path: '/login', component: Login, meta: { title: '用户登录' } },
+  { path: '/profile', component: Profile, meta: { title: '个人中心', requiresAuth: true } },
 
-  // 管理员后台
   {
     path: '/admin/users',
     component: () => import('@/views/admin/Users.vue'),

@@ -9,6 +9,10 @@ function handleLogout() {
   userStore.logout()
   router.push('/login')
 }
+
+function goProfile() {
+  router.push('/profile')
+}
 </script>
 
 <template>
@@ -37,11 +41,18 @@ function handleLogout() {
       </template>
       <template v-else>
         <span class="welcome">欢迎，{{ userStore.username }}</span>
+        <el-avatar
+          :src="userStore.avatar || 'https://i.pravatar.cc/150?img=1'"
+          size="small"
+          class="nav-avatar"
+          @click="$router.push('/profile')"
+        />
         <el-button type="danger" size="small" @click="handleLogout">
           退出
         </el-button>
       </template>
-    </div>
+</div>
+
   </el-header>
 </template>
 
@@ -53,6 +64,10 @@ function handleLogout() {
   background-color: #3fbed1;
   color: #fff;
   height: 60px;
+}
+.nav-avatar {
+  margin: 0 15px; /* 左右间距 */
+  cursor: pointer;
 }
 
 .logo {
@@ -74,7 +89,6 @@ function handleLogout() {
   box-shadow: none !important;
 }
 
-
 .auth {
   padding-right: 20px;
   display: flex;
@@ -85,5 +99,10 @@ function handleLogout() {
 .welcome {
   margin-right: 10px;
   color: #fff;
+}
+
+.avatar {
+  margin-right: 10px;
+  cursor: pointer;
 }
 </style>
