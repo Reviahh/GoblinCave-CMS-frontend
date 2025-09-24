@@ -10,10 +10,27 @@ import { useUserStore } from '@/stores/user'
 const routes = [
   { path: '/', component: Home, meta: { title: '首页' } },
   { path: '/news', component: News, meta: { title: '新闻公告' } },
-  { path: '/competitions', component: Competitions, meta: { title: '学科竞赛', requiresAuth: true } },
-  { path: '/courses', component: Courses, meta: { title: '课程管理', requiresAuth: true } },
+  { path: '/competitions', component: Competitions, meta: { title: '学科竞赛', requiresAuth: true, role: 'student' } },
+  { path: '/courses', component: Courses, meta: { title: '课程管理', requiresAuth: true, role: 'student' } },
   { path: '/about', component: About, meta: { title: '关于我们' } },
-  { path: '/login', component: Login, meta: { title: '用户登录' } }
+  { path: '/login', component: Login, meta: { title: '用户登录' } },
+
+  // 管理员后台
+  {
+    path: '/admin/users',
+    component: () => import('@/views/admin/Users.vue'),
+    meta: { title: '用户管理', requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/settings',
+    component: () => import('@/views/admin/Settings.vue'),
+    meta: { title: '系统设置', requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/publish',
+    component: () => import('@/views/admin/AdminPublish.vue'),
+    meta: { title: '发布竞赛题目', requiresAuth: true, role: 'admin' }
+  }
 ]
 
 const router = createRouter({
@@ -24,11 +41,18 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
+
+  // 登录拦截
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    next('/login')
-  } else {
-    next()
+    return next('/login')
   }
+
+  // 角色拦截
+  if (to.meta.role && userStore.role !== to.meta.role) {
+    return next('/') // 无权限访问时退回首页
+  }
+
+  next()
 })
 
 export default router

@@ -26,7 +26,6 @@ function handleLogout() {
         <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/news">新闻公告</el-menu-item>
         <el-menu-item index="/competitions">学科竞赛</el-menu-item>
-        <el-menu-item index="/courses">课程管理</el-menu-item>
         <el-menu-item index="/about">关于我们</el-menu-item>
       </el-menu>
     </div>
