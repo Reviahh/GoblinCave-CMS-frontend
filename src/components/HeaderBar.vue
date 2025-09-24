@@ -60,15 +60,27 @@ function handleLogout() {
   font-size: 20px;
   font-weight: bold;
   padding: 0 20px;
+  background-color: #3fbed1;
   color: #fff;
+  display: flex;
+  align-items: center;
+  height: 60px;
 }
 
 .nav-links {
   flex: 1;
 }
+.nav-links :deep(.el-menu) {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
 
 .auth {
   padding-right: 20px;
+  display: flex;
+  align-items: center;
+  height: 60px;
 }
 
 .welcome {
