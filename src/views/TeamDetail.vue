@@ -1,6 +1,9 @@
 <template>
   <div class="team-detail">
     <h2>队伍详情</h2>
+    <div style="margin-bottom: 10px">
+      <el-button type="primary" @click="goSeek">发起临时会话（寻找队友）</el-button>
+    </div>
 
     <el-form v-if="team" label-width="100px" :model="teamEdit">
       <el-form-item label="队伍名称">
@@ -86,5 +89,13 @@ function save() {
     members: teamEdit.members
   })
   router.back()
+}
+
+function goSeek() {
+  if (comp?.id) {
+    router.push({ path: '/seek', query: { competitionId: comp.id } })
+  } else {
+    router.push('/seek')
+  }
 }
 </script>

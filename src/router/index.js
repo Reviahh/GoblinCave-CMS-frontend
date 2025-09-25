@@ -54,6 +54,18 @@ const routes = [
     component: () => import('@/views/MyCompetitions.vue'),
     meta: { title: '我的竞赛', requiresAuth: true, role: 'student' }
   }
+  ,
+  {
+    path: '/seek',
+    component: () => import('@/views/ChatSeek.vue'),
+    meta: { title: '寻找队友', requiresAuth: true }
+  }
+  ,
+  {
+    path: '/chat',
+    component: () => import('@/views/ChatRoom.vue'),
+    meta: { title: '临时会话', requiresAuth: true }
+  }
 ]
 
 const router = createRouter({

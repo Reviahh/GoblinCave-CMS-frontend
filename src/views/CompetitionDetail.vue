@@ -7,6 +7,9 @@
     <!-- 学生视角 -->
     <div v-if="userStore.role === 'student'" class="student-section">
       <h3>报名参赛</h3>
+      <div style="margin-bottom: 10px">
+        <el-button type="primary" @click="goSeek">发起临时会话（寻找队友）</el-button>
+      </div>
 
       <!-- 单人赛提示 -->
       <p class="mode-tip" v-if="isSingle">
@@ -17,6 +20,27 @@
         当前模式：
         <strong>{{ mode === 'join' ? '参加（队员）' : '报名（队长）' }}</strong>
       </p>
+
+      <!-- 本竞赛的招募帖 -->
+      <div class="seek-section">
+        <h3>该竞赛的招募帖</h3>
+        <el-table v-if="postsForCompetition.length" :data="postsForCompetition" border>
+          <el-table-column prop="title" label="标题" />
+          <el-table-column prop="author" label="发布人" width="120" />
+          <el-table-column prop="createdAt" label="发布时间" width="180" />
+          <el-table-column label="方向/标签" width="220">
+            <template #default="{ row }">
+              <el-tag v-for="t in (row.tags || [])" :key="t" style="margin-right:6px" type="info">{{ t }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="140">
+            <template #default="{ row }">
+              <el-button type="primary" size="small" @click="goChat(row.id)">进入会话</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-empty v-else description="暂无招募帖" />
+      </div>
 
       <!-- 单人赛：直接报名（不展示成员编辑） -->
       <div v-if="isSingle">
@@ -119,6 +143,9 @@
     <!-- 管理员视角 -->
     <div v-else-if="userStore.role === 'admin'" class="admin-section">
       <h3>竞赛管理</h3>
+      <div style="margin-bottom: 10px">
+        <el-button type="primary" @click="goSeek">发起临时会话（寻找队友）</el-button>
+      </div>
       <!-- 编辑竞赛信息 -->
       <el-form :model="competition" label-width="100px">
         <el-form-item label="标题">
@@ -163,12 +190,14 @@ import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { useCompetitionStore } from '@/stores/competition'
 import { useTeamStore } from '@/stores/team'
+import { useChatStore } from '@/stores/chat'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const competitionStore = useCompetitionStore()
 const teamStore = useTeamStore()
+const chatStore = useChatStore()
 
 // 当前竞赛详情
 const competition = ref(
@@ -191,6 +220,11 @@ const teamForm = ref({
   leaderId: userStore.username, // 队长自动填充
   members: [] // 队员手动输入
 })
+
+// 本竞赛的招募帖
+const postsForCompetition = computed(() =>
+  (chatStore.posts || []).filter(p => p.competitionId == competition.value.id)
+)
 
 // 本竞赛的队伍
 const teamsInCompetition = computed(() =>
@@ -291,6 +325,14 @@ function goTeamDetail(teamId) {
 const myTeam = computed(() =>
   teamsInCompetition.value.find(t => t.leaderId === userStore.username || (t.members || []).some(m => m.userId === userStore.username))
 )
+
+function goSeek() {
+  router.push({ path: '/seek', query: { competitionId: competition.value.id } })
+}
+
+function goChat(postId) {
+  router.push({ path: '/chat', query: { postId } })
+}
 </script>
 
 <style scoped>
@@ -305,6 +347,13 @@ const myTeam = computed(() =>
 .student-section,
 .admin-section {
   margin-top: 30px;
+}
+.seek-section {
+  margin-top: 30px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 .member-row {
   display: flex;
