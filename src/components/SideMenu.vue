@@ -5,7 +5,7 @@
       <el-sub-menu index="1">
         <template #title>竞赛管理</template>
         <el-menu-item index="/competitions">竞赛列表</el-menu-item>
-        <el-menu-item index="/competitions/apply">报名入口</el-menu-item>
+        <el-menu-item v-if="userStore.role === 'student'" index="/my-competitions">我的竞赛</el-menu-item>
       </el-sub-menu>
 
       <!-- 只有管理员能看到的菜单 -->

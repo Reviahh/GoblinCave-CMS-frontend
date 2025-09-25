@@ -11,7 +11,7 @@ import { useUserStore } from '@/stores/user'
 const routes = [
   { path: '/', component: Home, meta: { title: '首页' } },
   { path: '/news', component: News, meta: { title: '新闻公告' } },
-  { path: '/competitions', component: Competitions, meta: { title: '学科竞赛', requiresAuth: true, role: 'student' } },
+  // { path: '/competitions', component: Competitions, meta: { title: '学科竞赛', requiresAuth: true } },
   { path: '/courses', component: Courses, meta: { title: '课程管理', requiresAuth: true, role: 'student' } },
   { path: '/about', component: About, meta: { title: '关于我们' } },
   { path: '/login', component: Login, meta: { title: '用户登录' } },
@@ -31,6 +31,28 @@ const routes = [
     path: '/admin/publish',
     component: () => import('@/views/admin/AdminPublish.vue'),
     meta: { title: '发布竞赛题目', requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/competitions',
+    component: () => import('@/views/Competitions.vue'),
+    meta: { title: '学科竞赛', requiresAuth: true }
+  },
+  {
+    path: '/competitions/:id',
+    component: () => import('@/views/CompetitionDetail.vue'),
+    meta: { title: '竞赛详情', requiresAuth: true }
+  }
+  ,
+  {
+    path: '/team-detail',
+    component: () => import('@/views/TeamDetail.vue'),
+    meta: { title: '队伍详情', requiresAuth: true }
+  }
+  ,
+  {
+    path: '/my-competitions',
+    component: () => import('@/views/MyCompetitions.vue'),
+    meta: { title: '我的竞赛', requiresAuth: true, role: 'student' }
   }
 ]
 

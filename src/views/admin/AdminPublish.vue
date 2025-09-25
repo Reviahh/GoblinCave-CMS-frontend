@@ -24,6 +24,20 @@
         />
       </el-form-item>
 
+      <el-form-item label="截止日期" prop="deadline" :rules="[{ required: true, message: '请选择截止日期', trigger: 'change' }]">
+        <el-date-picker
+          v-model="form.deadline"
+          type="date"
+          value-format="YYYY-MM-DD"
+          placeholder="请选择截止日期"
+          style="width: 260px"
+        />
+      </el-form-item>
+
+      <el-form-item label="人数限制" prop="maxMembers" :rules="[{ required: true, message: '请输入人数限制', trigger: 'change' }]">
+        <el-input-number v-model="form.maxMembers" :min="1" />
+      </el-form-item>
+
       <el-form-item>
         <el-button 
           type="primary" 
@@ -40,6 +54,9 @@
 <script setup>
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import { useCompetitionStore } from '@/stores/competition'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
 
 // 引入 Quill Editor，请确保你已安装 vue-quill
 // npm install @vueup/vue-quill
@@ -49,11 +66,16 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 // 表单实例和富文本编辑器实例的引用
 const formRef = ref(null);
 const quillEditorRef = ref(null);
+const competitionStore = useCompetitionStore();
+const userStore = useUserStore();
+const router = useRouter();
 
 // 表单数据
 const form = ref({
   title: '',
-  content: ''
+  content: '',
+  deadline: '',
+  maxMembers: 3
 });
 
 // 提交状态
@@ -155,17 +177,30 @@ const handlePublish = async () => {
         ElMessage.warning('题目内容不能为空');
         return;
       }
+      if (!form.value.deadline) {
+        ElMessage.warning('请选择截止日期');
+        return;
+      }
+      if (!form.value.maxMembers || form.value.maxMembers < 1) {
+        ElMessage.warning('人数限制必须大于等于 1');
+        return;
+      }
       
       isSubmitting.value = true;
       try {
-        // 调用后端 API
-        const res = await mockPublishApi(form.value);
-        if (res.success) {
-          ElMessage.success('题目发布成功！');
-          handleReset(); // 发布成功后重置表单
-        } else {
-          ElMessage.error(res.message || '发布失败');
-        }
+        // 写入 Pinia（本地模拟创建竞赛）
+        competitionStore.addCompetition({
+          id: Date.now(),
+          title: form.value.title,
+          description: form.value.content, // 使用富文本作为描述
+          publishTime: new Date().toISOString().slice(0, 10),
+          deadline: form.value.deadline,
+          createdBy: userStore.username || 'admin',
+          maxMembers: form.value.maxMembers
+        })
+        ElMessage.success('已创建本地竞赛');
+        handleReset();
+        router.push('/competitions');
       } catch (error) {
         console.error("发布失败:", error);
         ElMessage.error('发布过程中发生错误');
@@ -188,6 +223,8 @@ const handleReset = () => {
   if (quillEditorRef.value) {
      quillEditorRef.value.setHTML('');
   }
+  // 重置默认值
+  form.value.maxMembers = 3;
 };
 </script>
 
