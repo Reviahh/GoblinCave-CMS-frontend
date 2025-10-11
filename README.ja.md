@@ -1,10 +1,10 @@
-<div align="center">
+<p align="center"><img src="docs/images/logo.png" alt="GCS" /></p>
 
-# GoblinCave CMS Frontend
+<h1 align="center">GoblinCave CMS Frontend</h1>
 
-教育・競技向けのフロントエンド。Vue 3 + Vite + Pinia + Element Plus を採用し、セッションログイン、ロール認可、管理画面、リッチテキスト投稿などを提供します。
+<p align="center">教育・競技向けのフロントエンド。Vue 3 + Vite + Pinia + Element Plus を採用し、セッションログイン、ロール認可、管理画面、リッチテキスト投稿などを提供します。</p>
 
-<p>
+<p align="center">
   <a href="https://vuejs.org/"><img alt="Vue3" src="https://img.shields.io/badge/Vue-3.x-42b883?logo=vue.js&logoColor=white"></a>
   <a href="https://vitejs.dev/"><img alt="Vite" src="https://img.shields.io/badge/Vite-^7.0-646cff?logo=vite&logoColor=white"></a>
   <a href="https://pinia.vuejs.org/"><img alt="Pinia" src="https://img.shields.io/badge/Pinia-^3.0-f7d336"></a>
@@ -12,9 +12,7 @@
   <img alt="Node" src="https://img.shields.io/badge/Node-%5E20.19%20%7C%7C%20%E2%89%A522.12-43853d?logo=node.js&logoColor=white">
 </p>
 
-<img src="docs/images/hero.png" alt="プロジェクトヒーロー画像" width="860"/>
-
-</div>
+<p align="center"><img src="docs/images/hero.png" alt="プロジェクトヒーロー画像" /></p>
 
 - 日本語 | [简体中文](README.md)
 
@@ -90,10 +88,10 @@ npm run test:unit
 ```
 
 ## ドキュメントと協業
-- プロジェクト概要（機能 & TODO）：docs/overview.ja.md
-- 管理画面のフィールド/操作：docs/backend/admin-pages.ja.md
-- ユーザー API 仕様：docs/apis/user.ja.md
-- 画像ルール：docs/images/README.ja.md
+- プロジェクト概要（機能 & TODO）：docs/overview.md
+- 管理画面のフィールド/操作：docs/backend/admin-pages.md
+- ユーザー API 仕様：docs/apis/user.md
+- 画像ルール：docs/images/README.md
 
 ## コントリビューション
-- 参加方法とルールは [CONTRIBUTING.ja.md](CONTRIBUTING.ja.md) を参照してください。
+- 参加方法とルールは [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。

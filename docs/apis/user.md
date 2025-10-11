@@ -2,7 +2,6 @@
 
 后端基于 Spring Boot，统一返回 `BaseResponse<T>`：
 
-- 简体中文 | [日本語](user.ja.md)
 ```
 {
   code: number,
