@@ -1,6 +1,7 @@
 <script setup>
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import logo from '@/assets/logo.png'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -17,7 +18,10 @@ function goProfile() {
 
 <template>
   <el-header class="topbar">
-    <div class="logo">哥布林大学</div>
+    <div class="logo">
+      <img :src="logo" alt="logo" class="logo-img" />
+      <span>哥布林大学</span>
+    </div>
     <div class="nav-links">
       <el-menu
         mode="horizontal"
@@ -79,6 +83,13 @@ function goProfile() {
   display: flex;
   align-items: center;
   height: 60px;
+}
+
+.logo-img {
+  height: 32px; /* 适配 60px 顶栏的合适高度 */
+  width: auto;
+  margin-right: 8px;
+  display: block;
 }
 
 .nav-links {
