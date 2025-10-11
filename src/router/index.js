@@ -73,15 +73,25 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+let sessionChecked = false
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
+
+  // 首次导航尝试刷新会话态（基于后端 Session）
+  if (!sessionChecked) {
+    sessionChecked = true
+    try {
+      // 使用 store 暴露的方法刷新（内部会调用 apiGetCurrentUser）
+      await userStore.fetchCurrentUser()
+    } catch { }
+  }
 
   // 登录拦截
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
     return next('/login')
   }
 
-  // 角色拦截
+  // 角色拦截（前端约定 role: 'admin' | 'student'）
   if (to.meta.role && userStore.role !== to.meta.role) {
     return next('/') // 无权限访问时退回首页
   }
