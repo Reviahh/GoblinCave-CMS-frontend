@@ -1,22 +1,29 @@
-# GoblinCave CMS Frontend
-
-高性能的前后端分离教学/竞赛管理前端。基于 Vue 3 + Vite + Pinia + Element Plus，内置会话登录、角色鉴权、后台管理与富文本发布等能力。
-
-<p>
-	<a href="https://vuejs.org/"><img alt="Vue3" src="https://img.shields.io/badge/Vue-3.x-42b883?logo=vue.js&logoColor=white"></a>
-	<a href="https://vitejs.dev/"><img alt="Vite" src="https://img.shields.io/badge/Vite-^7.0-646cff?logo=vite&logoColor=white"></a>
-	<a href="https://pinia.vuejs.org/"><img alt="Pinia" src="https://img.shields.io/badge/Pinia-^3.0-f7d336"></a>
-	<a href="https://element-plus.org/"><img alt="Element Plus" src="https://img.shields.io/badge/Element%20Plus-2.x-409eff"></a>
-	<img alt="Node" src="https://img.shields.io/badge/Node-%5E20.19%20%7C%7C%20%E2%89%A522.12-43853d?logo=node.js&logoColor=white">
-			<img alt="License" src="https://img.shields.io/badge/License-TBD-lightgrey">
-  
-	<!-- 预留：构建状态/发布版本/覆盖率等徽章，可按需补充 -->
+<p align="center">
+  <img src="docs/images/logo.png" 
+  width="256" height="256"
+  alt="GCS Logo" />
 </p>
 
-<!-- 项目头图/演示动图：将图片放入 docs/images 并替换为实际文件 -->
-<img src="docs/images/hero.png" alt="项目头图：整体界面预览（首页/菜单/布局）" width="860"/>
+<h1 align="center">GCS</h1>
 
-</div>
+<p align="center">GCS 的意思是 GoblinCaveSystem
+<p align="center">本项目是 GoblinCaveSystem 的前端，又称 CCMS（GoblinCaveCompetitionSystem）<p>
+
+
+<p align="center">高性能的前后端分离教学/竞赛管理前端。基于 Vue 3 + Vite + Pinia + Element Plus，内置会话登录、角色鉴权、后台管理与富文本发布等能力。</p>
+
+<p align="center">
+  <a href="https://vuejs.org/"><img alt="Vue3" src="https://img.shields.io/badge/Vue-3.x-42b883?logo=vue.js&logoColor=white"></a>
+  <a href="https://vitejs.dev/"><img alt="Vite" src="https://img.shields.io/badge/Vite-^7.0-646cff?logo=vite&logoColor=white"></a>
+  <a href="https://pinia.vuejs.org/"><img alt="Pinia" src="https://img.shields.io/badge/Pinia-^3.0-f7d336"></a>
+  <a href="https://element-plus.org/"><img alt="Element Plus" src="https://img.shields.io/badge/Element%20Plus-2.x-409eff"></a>
+  <img alt="Node" src="https://img.shields.io/badge/Node-%5E20.19%20%7C%7C%20%E2%89%A522.12-43853d?logo=node.js&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/License-TBD-lightgrey">
+</p>
+
+<p align="center">
+  <img src="docs/images/hero.png" alt="项目头图：整体界面预览（首页/菜单/布局）" />
+</p>
 
 - 简体中文 | [日本語](README.ja.md)
 
@@ -31,9 +38,8 @@
 - [贡献指南](#贡献指南)
 
 ## 概述
-- 仓库根目录即为应用根目录（src/public/index.html 等都在根）
+- 仓库根目录即为应用根目录
 - 技术栈：Vue 3 + Vite + Pinia + Vue Router + Element Plus
-- 会话模型：基于 Cookie/Session，axios 已启用 withCredentials
 
 ## 特性
 - 多角色管理（学生/管理员），路由级别权限控制（meta.requiresAuth + meta.role）
@@ -86,21 +92,29 @@ npm run test:unit
 | 临时会话 | /chat | 登录 | 简易会话（示例） |
 | API 封装 | - | - | axios 全局配置于 src/api/http.js（withCredentials=true）；用户相关接口于 src/api/user.js，与后端 UserController 对齐 |
 
-### 截图（Screenshots）
+### 截图
 
-> 将截图放入 `docs/images/` 目录，以下为建议命名与说明：
+- 登录/注册
 
-- 登录/注册（docs/images/login.png）
-	- 说明：展示登录与注册两个 Tab，包含用户名/密码/角色选择（学生=0/管理员=1）与表单校验规则提示。
+<img src="docs/images/login.png" alt="登录/注册" />
+<img src="docs/images/register.png" alt="登录/注册" />
+- 说明：展示登录与注册两个 Tab，包含用户名/密码/角色选择（学生=0/管理员=1）与表单校验规则提示。
 	- 用途：文档与 README 展示登录流程与表单校验效果。
+	
+- 后台用户管理
 
-- 后台用户管理（docs/images/admin-users.png）
+<img src="docs/images/admin-users.png" alt="后台用户管理" />
+
 	- 说明：管理员视角的用户列表页，包含搜索、增删改操作的示例（当前为演示数据，后续可接入后端）。
 	- 用途：演示后台管理模块的入口与主要操作。
+	
+- 竞赛详情
 
-- 竞赛详情（docs/images/competition-detail.png）
+<img src="docs/images/competition-detail.png" alt="竞赛详情" />
+	
 	- 说明：展示竞赛详情页面，学生视角（报名/组队）与管理员视角（队伍管理/信息编辑）的不同区块。
 	- 用途：说明角色差异化渲染与核心业务流程。
+
 
 ## 配置说明
 - 后端 API 地址：在根目录的 `.env.*` 中设置 `VITE_API_BASE`，默认 `http://localhost:8080`
@@ -125,4 +139,3 @@ npm run test:unit
 
 ## 贡献指南
 请阅读根目录的 [CONTRIBUTING.md](CONTRIBUTING.md) 以了解分支策略、提交信息风格、代码规范与 PR 流程。
-```
