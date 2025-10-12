@@ -12,8 +12,8 @@
                 <div>• 密码至少 8 位</div>
               </template>
             </el-alert>
-            <el-form-item label="用户名">
-              <el-input v-model="loginForm.username" placeholder="请输入用户名"></el-input>
+            <el-form-item label="账号">
+              <el-input v-model="loginForm.account" placeholder="请输入账号（学号/工号等）"></el-input>
             </el-form-item>
             <el-form-item label="密码">
               <el-input v-model="loginForm.password" type="password" placeholder="请输入密码"></el-input>
@@ -36,13 +36,13 @@
           <el-form :model="registerForm" @submit.prevent="handleRegister">
             <el-alert type="info" :closable="false" title="填写规则" style="margin-bottom: 12px">
               <template #default>
-                <div>• 用户名至少 4 位，不能包含空格/标点/符号</div>
+                <div>• 账号需唯一（如学号/工号），长度 4-20，仅字母/数字/下划线/中划线</div>
                 <div>• 密码至少 8 位</div>
                 <div>• 两次输入的密码需一致</div>
               </template>
             </el-alert>
-            <el-form-item label="用户名">
-              <el-input v-model="registerForm.username" placeholder="请输入用户名"></el-input>
+            <el-form-item label="账号">
+              <el-input v-model="registerForm.account" placeholder="请输入账号（学号/工号等）"></el-input>
             </el-form-item>
             <el-form-item label="密码">
               <el-input v-model="registerForm.password" type="password" placeholder="请输入密码"></el-input>
@@ -80,34 +80,31 @@ const activeTab = ref('login')
 
 // 登录表单
 const loginForm = ref({
-  username: '',
+  account: '',
   password: '',
   userRole: 0,
 })
 
 // 注册表单
 const registerForm = ref({
-  username: '',
+  account: '',
   password: '',
   confirmPassword: '',
   userRole: 0,
 })
 
 const handleLogin = async () => {
-  const username = loginForm.value.username?.trim() || ''
+  const account = loginForm.value.account?.trim() || ''
   const password = loginForm.value.password || ''
   const invalidChars = /[\p{P}\p{S}\s]+/u // 标点、符号、空白
+  const accountRegex = /^[A-Za-z0-9_-]{4,20}$/
 
-  if (!username || !password) {
-    ElMessage.error('请输入用户名和密码')
+  if (!account || !password) {
+    ElMessage.error('请输入账号和密码')
     return
   }
-  if (username.length < 4) {
-    ElMessage.error('用户名不规范：至少 4 位，且不含空格/符号')
-    return
-  }
-  if (invalidChars.test(username)) {
-    ElMessage.error('用户名不支持特殊字符（空格/标点/符号）')
+  if (!accountRegex.test(account)) {
+    ElMessage.error('账号需为 4-20 位字母/数字/下划线/中划线')
     return
   }
   if (password.length < 8) {
@@ -116,7 +113,7 @@ const handleLogin = async () => {
   }
   try {
     await userStore.backendLogin({
-      username,
+      account,
       password,
       userRole: loginForm.value.userRole,
     })
@@ -133,21 +130,17 @@ const handleLogin = async () => {
 
 
 const handleRegister = async () => {
-  const username = registerForm.value.username?.trim() || ''
+  const account = registerForm.value.account?.trim() || ''
   const password = registerForm.value.password || ''
   const confirmPassword = registerForm.value.confirmPassword || ''
-  const invalidChars = /[\p{P}\p{S}\s]+/u
+  const accountRegex = /^[A-Za-z0-9_-]{4,20}$/
 
-  if (!username || !password || !confirmPassword) {
+  if (!account || !password || !confirmPassword) {
     ElMessage.error('请填写完整信息')
     return
   }
-  if (username.length < 4) {
-    ElMessage.error('用户名不规范：至少 4 位，且不含空格/符号')
-    return
-  }
-  if (invalidChars.test(username)) {
-    ElMessage.error('用户名不支持特殊字符（空格/标点/符号）')
+  if (!accountRegex.test(account)) {
+    ElMessage.error('账号需为 4-20 位字母/数字/下划线/中划线')
     return
   }
   if (password.length < 8 || confirmPassword.length < 8) {
@@ -159,14 +152,21 @@ const handleRegister = async () => {
     return
   }
   try {
+    // 使用账号作为 userAccount 完成注册
     await userStore.backendRegister({
-      username,
+      account,
       password,
       confirmPassword,
       userRole: registerForm.value.userRole,
     })
-    ElMessage.success('注册成功，请登录')
-    activeTab.value = 'login'
+    // 注册成功后自动登录并跳转到个人中心完善资料
+    await userStore.backendLogin({
+      account,
+      password,
+      userRole: registerForm.value.userRole,
+    })
+    ElMessage.success('注册成功，已自动登录，请完善资料')
+    router.push('/profile')
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || '注册失败')
   }

@@ -2,7 +2,7 @@
   <div class="profile-page">
     <h2>个人中心</h2>
 
-    <el-form :model="form" label-width="100px" class="profile-form">
+  <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" class="profile-form">
       <!-- 头像 -->
       <el-form-item label="头像">
         <div class="avatar-container">
@@ -50,24 +50,37 @@
         </div>
       </el-form-item>
 
-      <!-- 用户名 -->
-      <el-form-item label="用户名">
-        <el-input v-model="form.username" placeholder="请输入用户名" />
+      <!-- 账号（唯一标识，只展示不可修改） -->
+      <el-form-item label="账号">
+        <el-input v-model="form.userAccount" disabled />
+      </el-form-item>
+
+      <!-- 昵称（显示名，默认自动生成，可修改） -->
+      <el-form-item label="昵称">
+        <el-input v-model="form.username" placeholder="请输入昵称（可选）" />
       </el-form-item>
 
       <!-- 手机号 -->
-      <el-form-item label="手机号">
+      <el-form-item label="手机号" prop="phone">
         <el-input v-model="form.phone" placeholder="请输入手机号" />
       </el-form-item>
 
-      <!-- 密码 -->
-      <el-form-item label="密码">
-        <el-input
-          v-model="form.password"
-          type="password"
-          show-password
-          placeholder="请输入新密码"
-        />
+      <!-- 邮箱 -->
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="form.email" placeholder="请输入邮箱" />
+      </el-form-item>
+
+      <!-- 性别 -->
+      <el-form-item label="性别">
+        <el-select v-model="form.gender" placeholder="请选择性别">
+          <el-option label="男" :value="1" />
+          <el-option label="女" :value="0" />
+        </el-select>
+      </el-form-item>
+
+      <!-- 个人简介 -->
+      <el-form-item label="个人简介">
+        <el-input v-model="form.profile" type="textarea" :rows="3" placeholder="这一刻的想法…" />
       </el-form-item>
 
       <!-- 保存/重置 -->
@@ -87,11 +100,33 @@ const userStore = useUserStore()
 
 // 表单数据
 const form = ref({
-  username: userStore.username || '',
+  userAccount: userStore.userAccount || '',
+  username: userStore.userName || userStore.username || '',
   phone: userStore.phone || '',
-  password: userStore.password || '',
-  avatar: userStore.avatar || ''
+  email: userStore.email || '',
+  avatar: userStore.avatar || '',
+  profile: userStore.profile || '',
+  gender: (userStore.gender ?? '') === '' ? '' : Number(userStore.gender),
 })
+
+// 表单校验
+const formRef = ref()
+const phoneRegex = /^1[3-9]\d{9}$/
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const validatePhone = (rule, value, callback) => {
+  if (!value) return callback() // 允许为空
+  if (!phoneRegex.test(String(value).trim())) return callback(new Error('手机号格式不正确'))
+  return callback()
+}
+const validateEmail = (rule, value, callback) => {
+  if (!value) return callback() // 允许为空
+  if (!emailRegex.test(String(value).trim())) return callback(new Error('邮箱格式不正确'))
+  return callback()
+}
+const rules = {
+  phone: [{ validator: validatePhone, trigger: ['blur', 'change'] }],
+  email: [{ validator: validateEmail, trigger: ['blur', 'change'] }],
+}
 
 // 12 个预设头像
 const presetAvatars = [
@@ -127,21 +162,34 @@ const nextGroup = () => {
 }
 
 // 保存
-const saveProfile = () => {
-  if (!form.value.username || !form.value.phone || !form.value.password) {
-    alert('请填写完整信息')
-    return
+const saveProfile = async () => {
+  try {
+    await formRef.value?.validate()
+    if (!form.value.username) return alert('请输入用户名')
+    await userStore.updateProfile({
+      userAccount: form.value.userAccount,
+      username: form.value.username,
+      phone: form.value.phone,
+      email: form.value.email,
+      avatar: form.value.avatar,
+      profile: form.value.profile,
+      gender: form.value.gender === '' ? undefined : Number(form.value.gender),
+    })
+    alert('信息已保存！')
+  } catch (e) {
+    alert(e?.response?.data?.message || e?.message || '保存失败')
   }
-  userStore.updateProfile({ ...form.value })
-  alert('信息已保存！')
 }
 
 const resetForm = () => {
   form.value = {
-    username: userStore.username,
+    userAccount: userStore.userAccount,
+    username: userStore.userName || userStore.username,
     phone: userStore.phone,
-    password: userStore.password,
-    avatar: userStore.avatar
+    email: userStore.email,
+    avatar: userStore.avatar,
+    profile: userStore.profile,
+    gender: (userStore.gender ?? '') === '' ? '' : Number(userStore.gender),
   }
 }
 </script>

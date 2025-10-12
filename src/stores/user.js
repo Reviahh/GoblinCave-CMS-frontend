@@ -1,21 +1,27 @@
 import { defineStore } from 'pinia'
-import { apiLogin, apiRegister, apiLogout, apiGetCurrentUser } from '@/api/user'
+import { apiLogin, apiRegister, apiLogout, apiGetCurrentUser, apiUpdateUser } from '@/api/user'
 
 export const useUserStore = defineStore('user', {
     state: () => ({
         isLoggedIn: false,
         id: null,
+        userAccount: '',
+        userName: '',
         username: '',
-        role: '',
+        role: '', // 'student' | 'admin'
+        userRoleNum: null, // 0 学生，1 管理员
+        gender: '', // 建议后端使用数字 0/1/2；这里保持 '' 或 number
         phone: '',
         email: '',
         avatar: '',
+        tags: '',
         token: ''
     }),
     actions: {
-        async backendLogin({ username, password, userRole }) {
+        async backendLogin(payload) {
+            const { account, username, password, userRole } = payload || {}
             // 调用后端登录，后端返回 BaseResponse<User>
-            const base = await apiLogin({ username, password, userRole })
+            const base = await apiLogin({ account: account ?? username, password, userRole })
             if (!base || typeof base.code === 'undefined') {
                 throw new Error('登录失败：无效响应')
             }
@@ -33,24 +39,42 @@ export const useUserStore = defineStore('user', {
                 throw err
             }
 
-            // 后端字段调整：userRole（0 学生 / 1 管理员）
+            // 后端字段：userRole（0 学生 / 1 管理员）
             const roleNum = user.userRole
             const roleMap = { 1: 'admin', 0: 'student' }
             const roleStr = roleMap[roleNum] ?? 'student'
 
             this.isLoggedIn = true
             this.id = user.id
-            this.username = user.userAccount || user.userName || username
+            this.userAccount = user.userAccount || ''
+            this.userName = user.userName || ''
+            this.username = this.userName || this.userAccount || ''
             this.role = roleStr
+            this.userRoleNum = roleNum
             this.phone = user.phone || ''
             this.email = user.email || ''
             this.avatar = user.userUrl || ''
+            this.tags = user.tags || ''
+            this.gender = (user.gender ?? this.gender)
             // 如果你后端把 token 放在 cookie，这里可能没有 token
             // 如果后端以后返回 token，这里接一下
             this.token = user.token || ''
+
+            // 如果没有昵称（userName），自动生成一个，然后保存到后端
+            if (!this.userName) {
+                const defaultNick = `用户${String(this.userAccount || this.id || '').slice(-4) || Math.floor(1000 + Math.random() * 9000)}`
+                try {
+                    const resp = await apiUpdateUser({ id: this.id, userName: defaultNick })
+                    if (resp?.code === 0) {
+                        this.userName = defaultNick
+                        this.username = this.userName
+                    }
+                } catch { }
+            }
         },
-        async backendRegister({ username, password, confirmPassword, userRole }) {
-            const base = await apiRegister({ username, password, confirmPassword, userRole })
+        async backendRegister(payload) {
+            // 允许传入 account(手机号) 或 username，apiRegister 内部会做优先级映射
+            const base = await apiRegister(payload)
             if (!base || typeof base.code === 'undefined') {
                 throw new Error('注册失败：无效响应')
             }
@@ -72,11 +96,15 @@ export const useUserStore = defineStore('user', {
             try { await apiLogout() } catch { }
             this.isLoggedIn = false
             this.id = null
+            this.userAccount = ''
+            this.userName = ''
             this.username = ''
             this.role = ''
+            this.gender = ''
             this.phone = ''
             this.email = ''
             this.avatar = ''
+            this.tags = ''
             this.token = ''
         },
         async fetchCurrentUser() {
@@ -87,19 +115,54 @@ export const useUserStore = defineStore('user', {
                 const roleStr = roleMap[user.userRole] ?? 'student'
                 this.isLoggedIn = true
                 this.id = user.id
-                this.username = user.userAccount || user.userName || ''
+                this.userAccount = user.userAccount || ''
+                this.userName = user.userName || ''
+                this.username = this.userName || this.userAccount || ''
                 this.role = roleStr
+                this.userRoleNum = user.userRole
                 this.phone = user.phone || ''
                 this.email = user.email || ''
                 this.avatar = user.userUrl || ''
+                this.tags = user.tags || ''
+                this.gender = (user.gender ?? this.gender)
             }
         },
-        updateProfile(profile) {
-            if (profile.username !== undefined) this.username = profile.username
-            if (profile.phone !== undefined) this.phone = profile.phone
-            if (profile.role !== undefined) this.role = profile.role
-            if (profile.email !== undefined) this.email = profile.email
-            if (profile.avatar !== undefined) this.avatar = profile.avatar
+        async updateProfile(profile) {
+            // 仅更新允许的字段，密码更新后端未提供专用接口，这里不提交密码
+            const payload = {
+                id: this.id,
+                userAccount: profile.userAccount ?? this.userAccount,
+                userName: profile.username ?? this.username,
+                phone: profile.phone ?? this.phone,
+                email: profile.email ?? this.email,
+                userUrl: profile.avatar ?? this.avatar,
+                tags: profile.tags, // 可选
+                gender: profile.gender, // 可选
+                // 如需修改角色，仅管理员应能在后台改
+                ...(typeof profile.userRole !== 'undefined' && this.role === 'admin' ? { userRole: profile.userRole } : {})
+            }
+            const base = await apiUpdateUser(payload)
+            if (!base || base.code !== 0) {
+                const msg = base?.message || '更新失败'
+                const err = new Error(msg)
+                err.response = { data: { message: msg } }
+                throw err
+            }
+            // 成功后同步本地
+            if (payload.userAccount !== undefined) this.userAccount = payload.userAccount
+            if (payload.userName !== undefined) this.userName = payload.userName
+            // 展示名优先 userName
+            this.username = this.userName || this.userAccount || this.username
+            if (payload.phone !== undefined) this.phone = payload.phone
+            if (payload.email !== undefined) this.email = payload.email
+            if (payload.userUrl !== undefined) this.avatar = payload.userUrl
+            if (payload.tags !== undefined) this.tags = payload.tags
+            if (payload.gender !== undefined) this.gender = payload.gender
+            if (payload.userRole !== undefined) {
+                this.userRoleNum = payload.userRole
+                const roleMap = { 1: 'admin', 0: 'student' }
+                this.role = roleMap[payload.userRole] ?? this.role
+            }
         }
     },
     persist: true // 启用持久化

@@ -14,19 +14,17 @@
             </template>
           </el-input>
         </el-col>
-        <el-col :span="4">
-          <el-button type="primary" @click="handleAdd">添加用户</el-button>
-        </el-col>
+        <el-col :span="4"></el-col>
       </el-row>
 
       <el-table :data="userList" border stripe v-loading="loading">
         <el-table-column type="index" label="#"></el-table-column>
-        <el-table-column label="用户名" prop="username"></el-table-column>
+        <el-table-column label="用户名" prop="userAccount"></el-table-column>
         <el-table-column label="邮箱" prop="email"></el-table-column>
-        <el-table-column label="角色" prop="role">
+        <el-table-column label="角色" prop="userRole">
           <template #default="scope">
-            <el-tag :type="scope.row.role === 'admin' ? 'success' : 'info'">
-              {{ scope.row.role === 'admin' ? '管理员' : '普通用户' }}
+            <el-tag :type="scope.row.userRole === 1 ? 'success' : 'info'">
+              {{ scope.row.userRole === 1 ? '管理员' : '学生' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -56,20 +54,18 @@
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="50%" @close="resetForm">
       <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-width="80px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="userForm.username"></el-input>
+        <el-form-item label="用户名" prop="userAccount">
+          <el-input v-model="userForm.userAccount"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="!userForm.id">
-          <el-input v-model="userForm.password" type="password"></el-input>
-        </el-form-item>
+        <!-- 后台不支持直接在此修改密码，新增用户请走注册流程 -->
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="userForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="角色" prop="role">
-           <el-select v-model="userForm.role" placeholder="请选择角色">
-            <el-option label="管理员" value="admin"></el-option>
-            <el-option label="普通用户" value="user"></el-option>
-          </el-select>
+        <el-form-item label="角色" prop="userRole">
+           <el-select v-model="userForm.userRole" placeholder="请选择角色">
+            <el-option label="学生" :value="0"></el-option>
+            <el-option label="管理员" :value="1"></el-option>
+           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -87,9 +83,9 @@ import { ref, onMounted, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 
 // --- 响应式数据 ---
-const loading = ref(true);
-const userList = ref([]); // 用户列表
-const total = ref(0); // 总用户数
+const loading = ref(false);
+const userList = ref([]);
+const total = ref(0);
 const queryParams = reactive({
   username: '',
   pageNum: 1,
@@ -98,118 +94,94 @@ const queryParams = reactive({
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
 const userFormRef = ref(null);
-const userForm = ref({
-  id: null,
-  username: '',
-  password: '',
-  email: '',
-  role: 'user'
-});
+const userForm = ref({ id: null, userAccount: '', email: '', userRole: 0 });
 const userFormRules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  userAccount: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
   ],
-  role: [{ required: true, message: '请选择角色', trigger: 'change' }]
+  userRole: [{ required: true, message: '请选择角色', trigger: 'change' }]
 };
 
-// --- 模拟数据 ---
-const allUsers = ref([]);
-onMounted(() => {
-  // 模拟从 API 获取数据
-  const mockData = Array.from({ length: 37 }).map((_, i) => ({
-    id: i + 1,
-    username: `user_${i + 1}`,
-    email: `user${i+1}@example.com`,
-    role: i % 5 === 0 ? 'admin' : 'user',
-    createTime: new Date(Date.now() - Math.random() * 10000000000).toLocaleDateString()
-  }));
-  allUsers.value = mockData;
-  getUsersList();
-});
+onMounted(() => { getUsersList(); });
 
 // --- 方法 ---
 
-// 获取用户列表（模拟）
-const getUsersList = () => {
+import { apiSearchUsers, apiUpdateUser, apiDeleteUser } from '@/api/user'
+const getUsersList = async () => {
   loading.value = true;
-  // 模拟筛选
-  const filtered = allUsers.value.filter(user => 
-    user.username.toLowerCase().includes(queryParams.username.toLowerCase())
-  );
-  // 模拟分页
-  const start = (queryParams.pageNum - 1) * queryParams.pageSize;
-  const end = start + queryParams.pageSize;
-  userList.value = filtered.slice(start, end);
-  total.value = filtered.length;
-  
-  setTimeout(() => {
+  try {
+    const base = await apiSearchUsers({ userName: queryParams.username })
+    if (base?.code === 0) {
+      userList.value = base.data || []
+      total.value = userList.value.length
+    } else {
+      ElMessage.error(base?.message || '获取用户失败')
+    }
+  } finally {
     loading.value = false;
-  }, 300); // 模拟加载延迟
+  }
 };
 
-// 打开新增用户对话框
-const handleAdd = () => {
-  resetForm();
-  dialogTitle.value = '添加新用户';
-  dialogVisible.value = true;
-};
+// 此处暂不支持新增用户（请走注册流程）
 
 // 打开编辑用户对话框
 const handleEdit = (row) => {
   // 深拷贝，避免直接修改列表数据
-  userForm.value = JSON.parse(JSON.stringify(row));
-  // 编辑时不需要显示密码
-  delete userForm.value.password;
+  userForm.value = {
+    id: row.id,
+    userAccount: row.userAccount || row.userName,
+    email: row.email,
+    userRole: row.userRole ?? 0,
+  }
   dialogTitle.value = '编辑用户';
   dialogVisible.value = true;
 };
 
 // 删除用户
-const handleDelete = (id) => {
-  allUsers.value = allUsers.value.filter(user => user.id !== id);
-  getUsersList(); // 重新获取数据
-  ElMessage.success('删除成功！');
+const handleDelete = async (id) => {
+  try {
+    const base = await apiDeleteUser(id)
+    if (base?.code === 0) {
+      ElMessage.success('删除成功！')
+      getUsersList()
+    } else {
+      ElMessage.error(base?.message || '删除失败')
+    }
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || '删除失败')
+  }
 };
 
 // 提交表单（新增/编辑）
 const submitForm = () => {
-  userFormRef.value.validate((valid) => {
-    if (valid) {
-      if (userForm.value.id) {
-        // 编辑
-        const index = allUsers.value.findIndex(user => user.id === userForm.value.id);
-        if (index !== -1) {
-          allUsers.value[index] = { ...allUsers.value[index], ...userForm.value };
-        }
-        ElMessage.success('更新成功！');
-      } else {
-        // 新增
-        const newUser = {
-          ...userForm.value,
-          id: Date.now(), // 模拟唯一ID
-          createTime: new Date().toLocaleDateString()
-        };
-        allUsers.value.unshift(newUser);
-        ElMessage.success('添加成功！');
+  userFormRef.value.validate(async (valid) => {
+    if (!valid) return
+    try {
+      const payload = {
+        id: userForm.value.id,
+        userAccount: userForm.value.userAccount,
+        email: userForm.value.email,
+        userRole: userForm.value.userRole,
       }
-      getUsersList();
-      dialogVisible.value = false;
+      const base = await apiUpdateUser(payload)
+      if (base?.code === 0) {
+        ElMessage.success('更新成功！')
+        dialogVisible.value = false
+        getUsersList()
+      } else {
+        ElMessage.error(base?.message || '更新失败')
+      }
+    } catch (e) {
+      ElMessage.error(e?.response?.data?.message || '更新失败')
     }
-  });
+  })
 };
 
 // 重置表单
 const resetForm = () => {
-  userForm.value = {
-    id: null,
-    username: '',
-    password: '',
-    email: '',
-    role: 'user'
-  };
+  userForm.value = { id: null, userAccount: '', email: '', userRole: 0 };
   if (userFormRef.value) {
     userFormRef.value.resetFields();
   }

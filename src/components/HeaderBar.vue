@@ -4,6 +4,9 @@ import { useRouter } from 'vue-router'
 import logo from '@/assets/logo.png'
 
 const userStore = useUserStore()
+function displayName() {
+  return userStore.userName || userStore.username || userStore.userAccount || '用户'
+}
 const router = useRouter()
 
 function handleLogout() {
@@ -44,7 +47,7 @@ function goProfile() {
         </el-button>
       </template>
       <template v-else>
-        <span class="welcome">欢迎，{{ userStore.username }}</span>
+  <span class="welcome">欢迎，{{ displayName() }}</span>
         <el-avatar
           :src="userStore.avatar || 'https://i.pravatar.cc/150?img=1'"
           size="small"

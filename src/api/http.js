@@ -1,7 +1,10 @@
 import axios from 'axios'
+// 允许跨域携带 Cookie
+axios.defaults.withCredentials = true;
 
 const http = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:8080',
+    // 使用相对路径，开发环境走 Vite 代理（见 vite.config.js -> server.proxy），避免跨站 Cookie 丢失
+    baseURL: import.meta.env.VITE_API_BASE || '/',
     withCredentials: true,
     timeout: 15000,
 })
@@ -27,7 +30,10 @@ http.interceptors.response.use(
             try {
                 localStorage.removeItem('user')
             } catch { }
-            // 可在此处做路由跳转
+            // 跳转登录，避免停留在需要权限的页面
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login'
+            }
         }
         // 规范化错误信息（兼容 BaseResponse 错误消息）
         const server = err?.response?.data

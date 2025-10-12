@@ -5,7 +5,7 @@ import http from './http'
 export function apiRegister(payload) {
     // 映射前端字段到后端：userAccount / userPassword / checkPassword
     const body = {
-        userAccount: payload.username,
+        userAccount: payload.account ?? payload.username,
         userPassword: payload.password,
         checkPassword: payload.confirmPassword,
         // 后端接受 Integer userRole，可选
@@ -17,7 +17,7 @@ export function apiRegister(payload) {
 
 export function apiLogin(payload) {
     const body = {
-        userAccount: payload.username,
+        userAccount: payload.account ?? payload.username,
         userPassword: payload.password,
         // 后端接受 Integer userRole，可选
         userRole: payload.userRole,
