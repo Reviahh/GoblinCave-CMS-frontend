@@ -10,7 +10,7 @@ export const useUserStore = defineStore('user', {
         username: '',
         role: '', // 'student' | 'admin'
         userRoleNum: null, // 0 学生，1 管理员
-        gender: '', // 建议后端使用数字 0/1/2；这里保持 '' 或 number
+        gender: '',
         phone: '',
         email: '',
         avatar: '',

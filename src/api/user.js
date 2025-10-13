@@ -8,7 +8,6 @@ export function apiRegister(payload) {
         userAccount: payload.account ?? payload.username,
         userPassword: payload.password,
         checkPassword: payload.confirmPassword,
-        // 后端接受 Integer userRole，可选
         userRole: payload.userRole,
     }
     // 返回整个 BaseResponse，交由上层判断 code
