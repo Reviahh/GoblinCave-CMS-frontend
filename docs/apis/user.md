@@ -1,211 +1,567 @@
-# 用户模块接口文档
-## 一、用户实体结构(数据库)
-
-| 字段名 | 类型 | 说明 |
-|--------|------|------|
-| id | Long | 用户唯一标识 |
-| username | String | 用户名 |
-| password | String | 登录密码（仅注册与登录时使用） |
-| userUrl | String | 用户头像URL |
-| email | String | 邮箱 |
-| tags | String | 个人简介 |
-| role | String | 用户角色（user/admin） |
-| createTime | Date | 注册时间 |
-| updateTime | Date | 更新时间 |
+---
+title: 默认模块
+language_tabs:
+  - shell: Shell
+  - http: HTTP
+  - javascript: JavaScript
+  - ruby: Ruby
+  - python: Python
+  - php: PHP
+  - java: Java
+  - go: Go
+toc_footers: []
+includes: []
+search: true
+code_clipboard: true
+highlight_theme: darkula
+headingLevel: 2
+generator: "@tarslib/widdershins v4.0.30"
 
 ---
 
-## 二、接口列表
+# 默认模块
 
-### 1. 用户注册
+Base URLs:
 
-- **URL**：`/user/register`
-- **方法**：`POST`
-- **权限**：公开（无需登录）
+# Authentication
 
-**请求体：**
+# 用户接口
+
+## POST 用户注册
+
+POST /user/register
+
+> Body 请求参数
+
 ```json
 {
-  "userAccount": "ihliai",
-  "userPassword": "123456666",
-  "checkPassword": "123456666",
-  "userRole": "0"
+  "userAccount": "string",
+  "userPassword": "string",
+  "checkPassword": "string",
+  "userRole": 0
 }
 ```
 
-**返回示例：**
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|[UserRegisterRequest](#schemauserregisterrequest)| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
 ```json
 {
   "code": 0,
-  "data": 1,
-  "message": "注册成功"
+  "data": 0,
+  "message": "",
+  "description": ""
 }
 ```
 
----
+### 返回结果
 
-### 2. 用户登录
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseLong](#schemabaseresponselong)|
 
-- **URL**：`/user/login`
-- **方法**：`POST`
-- **权限**：公开
+## POST 用户登录
 
-**请求体：**
+POST /user/login
+
+> Body 请求参数
+
 ```json
 {
-  "userAccount": "1111",
-  "userPassword": "11111111",
-  "userRole": "0"
+  "userAccount": "string",
+  "userPassword": "string",
+  "userRole": 0
 }
 ```
 
-**返回示例：**
-```json
-{
-    "code": 0,
-    "data": {
-        "id": 13,
-        "userName": "sbyg",
-        "userAccount": "1111",
-        "userPassword": null,
-        "userUrl": "https://i.pravatar.cc/150?img=6",
-        "gender": null,
-        "phone": "123131",
-        "email": "",
-        "tags": null,
-        "userRole": 0,
-        "createTime": "2025-10-11 18:18:09",
-        "updateTime": null,
-        "isDelete": null,
-        "profile": null
-    },
-    "message": "successful",
-    "description": ""
-}
-```
+### 请求参数
 
----
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|[UserLoginRequest](#schemauserloginrequest)| 否 |none|
 
-### 3. 获取当前登录用户信息
+> 返回示例
 
-- **URL**：`/user/current`
-- **方法**：`GET`
-- **权限**：需要登录 ✅
+> 200 Response
 
-**返回示例：**
 ```json
 {
   "code": 0,
   "data": {
-    "id": 1,
-    "username": "ihli",
-    "userUrl": "https://example.com/userUrl.png",
-    "tags": "热爱Flutter开发",
-    "email": "ihli@example.com",
-    "role": "user"
-  }
+    "id": 0,
+    "userName": "",
+    "userAccount": "",
+    "userPassword": "",
+    "userUrl": "",
+    "gender": 0,
+    "phone": "",
+    "email": "",
+    "tags": "",
+    "userRole": 0,
+    "createTime": "",
+    "updateTime": "",
+    "isDelete": 0
+  },
+  "message": "",
+  "description": ""
 }
 ```
 
----
+### 返回结果
 
-### 4. 更新个人信息
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseUser](#schemabaseresponseuser)|
 
-- **URL**：`/user/update`
-- **方法**：`POST`
-- **权限**：需要登录 ✅
+## POST 用户登出
 
-**请求体：**
-```json
-{
-  "userUrl": "https://example.com/new-userUrl.png",
-  "tags": "Flutter开发者 | 健身爱好者"
-}
-```
+POST /user/logout
 
-**返回：**
+> 返回示例
+
+> 200 Response
+
 ```json
 {
   "code": 0,
-  "message": "修改成功"
+  "data": 0,
+  "message": "",
+  "description": ""
 }
 ```
 
----
+### 返回结果
 
-### 5. 用户列表（管理员）
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseInteger](#schemabaseresponseinteger)|
 
-- **URL**：`/user/list`
-- **方法**：`GET`
-- **权限**：管理员 ✅
+## GET 查询当前用户
 
-**参数：**
-| 参数名 | 类型 | 说明 |
-|--------|------|------|
-| username | String | 模糊查询用户名（可选） |
+GET /user/current
 
-**返回示例：**
+> 返回示例
+
+> 200 Response
+
+```json
+{
+  "code": 0,
+  "data": {
+    "id": 0,
+    "userName": "",
+    "userAccount": "",
+    "userPassword": "",
+    "userUrl": "",
+    "gender": 0,
+    "phone": "",
+    "email": "",
+    "tags": "",
+    "userRole": 0,
+    "createTime": "",
+    "updateTime": "",
+    "isDelete": 0
+  },
+  "message": "",
+  "description": ""
+}
+```
+
+### 返回结果
+
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseUser](#schemabaseresponseuser)|
+
+## GET 查询用户列表
+
+GET /user/search
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|userName|query|string| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
 ```json
 {
   "code": 0,
   "data": [
     {
-      "id": 1,
-      "username": "ihli",
-      "email": "ihli@example.com",
-      "tags": "健康运动研究者",
-      "role": "user"
-    },
-    {
-      "id": 2,
-      "username": "admin",
-      "tags": "系统管理员",
-      "role": "admin"
+      "id": 0,
+      "userName": "",
+      "userAccount": "",
+      "userPassword": "",
+      "userUrl": "",
+      "gender": 0,
+      "phone": "",
+      "email": "",
+      "tags": "",
+      "userRole": 0,
+      "createTime": "",
+      "updateTime": "",
+      "isDelete": 0
     }
-  ]
+  ],
+  "message": "",
+  "description": ""
 }
 ```
 
----
+### 返回结果
 
-### 6. 删除用户（管理员）
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseListUser](#schemabaseresponselistuser)|
 
-- **URL**：`/user/delete/{id}`
-- **方法**：`DELETE`
-- **权限**：管理员 ✅
+## POST 更新用户信息
 
-**返回示例：**
+POST /user/update
+
+> Body 请求参数
+
+```json
+{
+  "id": 0,
+  "userName": "string",
+  "userAccount": "string",
+  "userPassword": "string",
+  "userUrl": "string",
+  "gender": 0,
+  "phone": "string",
+  "email": "string",
+  "tags": "string",
+  "userRole": 0,
+  "createTime": "string",
+  "updateTime": "string",
+  "isDelete": 0
+}
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|[User](#schemauser)| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
 ```json
 {
   "code": 0,
-  "message": "删除成功"
+  "data": 0,
+  "message": "",
+  "description": ""
 }
 ```
 
----
+### 返回结果
 
-### 7. 用户登出
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseInteger](#schemabaseresponseinteger)|
 
-- **URL**：`/user/logout`
-- **方法**：`POST`
-- **权限**：需要登录 ✅
+## POST 删除用户
 
-**返回示例：**
+POST /user/delete
+
+> Body 请求参数
+
+```json
+0
+```
+
+### 请求参数
+
+|名称|位置|类型|必选|说明|
+|---|---|---|---|---|
+|body|body|integer| 否 |none|
+
+> 返回示例
+
+> 200 Response
+
 ```json
 {
   "code": 0,
-  "message": "退出成功"
+  "data": false,
+  "message": "",
+  "description": ""
 }
 ```
 
----
+### 返回结果
 
-## 三、状态码说明
+|状态码|状态码含义|说明|数据模型|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|none|[BaseResponseBoolean](#schemabaseresponseboolean)|
 
-| 状态码 | 含义 |
-|--------|------|
-| 0 | 成功 |
-| 40000 | 参数错误 |
-| 40100 | 未登录或登录失效 |
-| 40300 | 无权限 |
-| 50000 | 系统异常 |
+# 数据模型
+
+<h2 id="tocS_BaseResponseLong">BaseResponseLong</h2>
+
+<a id="schemabaseresponselong"></a>
+<a id="schema_BaseResponseLong"></a>
+<a id="tocSbaseresponselong"></a>
+<a id="tocsbaseresponselong"></a>
+
+```json
+{
+  "code": 0,
+  "data": 0,
+  "message": "string",
+  "description": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|integer|false|none||none|
+|data|integer(int64)|false|none||none|
+|message|string|false|none||none|
+|description|string|false|none||none|
+
+<h2 id="tocS_UserRegisterRequest">UserRegisterRequest</h2>
+
+<a id="schemauserregisterrequest"></a>
+<a id="schema_UserRegisterRequest"></a>
+<a id="tocSuserregisterrequest"></a>
+<a id="tocsuserregisterrequest"></a>
+
+```json
+{
+  "userAccount": "string",
+  "userPassword": "string",
+  "checkPassword": "string",
+  "userRole": 0
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|userAccount|string|false|none||none|
+|userPassword|string|false|none||none|
+|checkPassword|string|false|none||none|
+|userRole|integer|false|none||none|
+
+<h2 id="tocS_User">User</h2>
+
+<a id="schemauser"></a>
+<a id="schema_User"></a>
+<a id="tocSuser"></a>
+<a id="tocsuser"></a>
+
+```json
+{
+  "id": 0,
+  "userName": "string",
+  "userAccount": "string",
+  "userPassword": "string",
+  "userUrl": "string",
+  "gender": 0,
+  "phone": "string",
+  "email": "string",
+  "tags": "string",
+  "userRole": 0,
+  "createTime": "string",
+  "updateTime": "string",
+  "isDelete": 0
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|id|integer(int64)|false|none||id|
+|userName|string|false|none||用户昵称|
+|userAccount|string|false|none||用户账号|
+|userPassword|string|false|none||用户密码|
+|userUrl|string|false|none||用户头像|
+|gender|integer|false|none||性别 0-女 1-男|
+|phone|string|false|none||电话|
+|email|string|false|none||邮箱|
+|tags|string|false|none||个人简介|
+|userRole|integer|false|none||用户角色 0-普通用户，1-管理员|
+|createTime|string|false|none||创建时间|
+|updateTime|string|false|none||更新时间|
+|isDelete|integer|false|none||是否删除|
+
+<h2 id="tocS_BaseResponseUser">BaseResponseUser</h2>
+
+<a id="schemabaseresponseuser"></a>
+<a id="schema_BaseResponseUser"></a>
+<a id="tocSbaseresponseuser"></a>
+<a id="tocsbaseresponseuser"></a>
+
+```json
+{
+  "code": 0,
+  "data": {
+    "id": 0,
+    "userName": "string",
+    "userAccount": "string",
+    "userPassword": "string",
+    "userUrl": "string",
+    "gender": 0,
+    "phone": "string",
+    "email": "string",
+    "tags": "string",
+    "userRole": 0,
+    "createTime": "string",
+    "updateTime": "string",
+    "isDelete": 0
+  },
+  "message": "string",
+  "description": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|integer|false|none||none|
+|data|[User](#schemauser)|false|none||none|
+|message|string|false|none||none|
+|description|string|false|none||none|
+
+<h2 id="tocS_UserLoginRequest">UserLoginRequest</h2>
+
+<a id="schemauserloginrequest"></a>
+<a id="schema_UserLoginRequest"></a>
+<a id="tocSuserloginrequest"></a>
+<a id="tocsuserloginrequest"></a>
+
+```json
+{
+  "userAccount": "string",
+  "userPassword": "string",
+  "userRole": 0
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|userAccount|string|false|none||none|
+|userPassword|string|false|none||none|
+|userRole|integer|false|none||none|
+
+<h2 id="tocS_BaseResponseInteger">BaseResponseInteger</h2>
+
+<a id="schemabaseresponseinteger"></a>
+<a id="schema_BaseResponseInteger"></a>
+<a id="tocSbaseresponseinteger"></a>
+<a id="tocsbaseresponseinteger"></a>
+
+```json
+{
+  "code": 0,
+  "data": 0,
+  "message": "string",
+  "description": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|integer|false|none||none|
+|data|integer|false|none||none|
+|message|string|false|none||none|
+|description|string|false|none||none|
+
+<h2 id="tocS_BaseResponseListUser">BaseResponseListUser</h2>
+
+<a id="schemabaseresponselistuser"></a>
+<a id="schema_BaseResponseListUser"></a>
+<a id="tocSbaseresponselistuser"></a>
+<a id="tocsbaseresponselistuser"></a>
+
+```json
+{
+  "code": 0,
+  "data": [
+    {
+      "id": 0,
+      "userName": "string",
+      "userAccount": "string",
+      "userPassword": "string",
+      "userUrl": "string",
+      "gender": 0,
+      "phone": "string",
+      "email": "string",
+      "tags": "string",
+      "userRole": 0,
+      "createTime": "string",
+      "updateTime": "string",
+      "isDelete": 0
+    }
+  ],
+  "message": "string",
+  "description": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|integer|false|none||none|
+|data|[[User](#schemauser)]|false|none||none|
+|message|string|false|none||none|
+|description|string|false|none||none|
+
+<h2 id="tocS_BaseResponseBoolean">BaseResponseBoolean</h2>
+
+<a id="schemabaseresponseboolean"></a>
+<a id="schema_BaseResponseBoolean"></a>
+<a id="tocSbaseresponseboolean"></a>
+<a id="tocsbaseresponseboolean"></a>
+
+```json
+{
+  "code": 0,
+  "data": true,
+  "message": "string",
+  "description": "string"
+}
+
+```
+
+### 属性
+
+|名称|类型|必选|约束|中文名|说明|
+|---|---|---|---|---|---|
+|code|integer|false|none||none|
+|data|boolean|false|none||none|
+|message|string|false|none||none|
+|description|string|false|none||none|
+
