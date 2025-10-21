@@ -7,7 +7,7 @@
 <h1 align="center">GCS</h1>
 
 <p align="center">GCS 的意思是 GoblinCaveSystem
-<p align="center">本项目是 GoblinCaveSystem 的前端，又称 GCMS（GoblinCaveCompetitionSystem）<p>
+<p align="center">本项目是 GoblinCaveSystem 的前端，又称 GCCS（GoblinCaveCompetitionSystem）<p>
 
 
 <p align="center">高性能的前后端分离教学/竞赛管理前端。基于 Vue 3 + Vite + Pinia + Element Plus，内置会话登录、角色鉴权、后台管理与富文本发布等能力。</p>
