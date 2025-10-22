@@ -49,6 +49,9 @@ export function apiUpdateUser(user) {
 
 // 删除用户（需要管理员权限），后端要求请求体是一个 long 数字
 export function apiDeleteUser(id) {
-    // 直接发送 JSON number：axios 会以 application/json 发送 123
-    return http.post('/user/delete', id).then((res) => res?.data)
+    // 直接发送 JSON number：部分代理或环境可能会改变 Content-Type，
+    // 所以显式序列化并设置 application/json，避免后端解析失败导致 415
+    return http.post('/user/delete', JSON.stringify(id), {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+    }).then((res) => res?.data)
 }
