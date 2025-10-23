@@ -67,7 +67,7 @@ const chatStore = useChatStore()
 
 const postId = Number(route.query.postId)
 const post = chatStore.posts.find(p => p.id === postId)
-const competitionTitle = computed(() => competitionStore.competitions.find(c => c.id == post?.competitionId)?.title || '未关联')
+const competitionTitle = computed(() => competitionStore.competitions.find(c => c.id == post?.competitionId)?.name || '未关联')
 const messages = computed(() => chatStore.messagesByPost[postId] || [])
 
 const text = ref('')

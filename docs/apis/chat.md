@@ -29,9 +29,3 @@ interface Message {
 - POST /chat/room/create { compId?, teamId?, topic? }
 - GET /chat/message/list?roomId&pageNum&pageSize
 - POST /chat/message/send { roomId, content }
-
-## WebSocket 方案（骨架）
-- 握手：/ws/chat（带 Cookie/Token）
-- 订阅：根据 roomId 订阅频道（例如 /topic/room/{roomId}）
-- 发送：消息体 { roomId, content }
-- 鉴权：仅房间成员可订阅/发送

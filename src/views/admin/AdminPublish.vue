@@ -11,9 +11,26 @@
       </el-form-item>
 
       <el-form-item 
+        label="题目摘要"
+        prop="summary"
+        :rules="[{ required: true, message: '题目摘要不能为空', trigger: 'blur' }]">
+        <el-input v-model="form.summary" type="textarea" :rows="3" placeholder="请输入题目摘要（将显示在竞赛列表）" />
+      </el-form-item>
+
+      <el-form-item label="开始日期" prop="startTime" :rules="[{ required: true, message: '请选择开始日期', trigger: 'change' }]">
+        <el-date-picker
+          v-model="form.startTime"
+          type="date"
+          value-format="YYYY-MM-DD"
+          placeholder="请选择开始日期"
+          style="width: 260px"
+        />
+      </el-form-item>
+
+      <el-form-item 
         label="题目内容" 
         prop="content"
-        :rules="[{ required: true, message: '题目内容不能为空', trigger: 'blur' }]">
+        :rules="[]">
         <quill-editor
           ref="quillEditorRef"
           v-model:content="form.content"
@@ -74,6 +91,8 @@ const router = useRouter();
 const form = ref({
   title: '',
   content: '',
+  summary: '',
+  startTime: '',
   deadline: '',
   maxMembers: 3
 });
@@ -172,9 +191,9 @@ const handlePublish = async () => {
   // 校验表单
   await formRef.value.validate(async (valid) => {
     if (valid) {
-      // 检查内容是否为空（Quill 空内容可能为 '<p><br></p>'）
-      if (!form.value.content || form.value.content === '<p><br></p>') {
-        ElMessage.warning('题目内容不能为空');
+      // 检查内容或摘要是否为空（Quill 空内容可能为 '<p><br></p>'）
+      if ((!form.value.content || form.value.content === '<p><br></p>') && !form.value.summary) {
+        ElMessage.warning('题目内容或摘要不能为空，至少填写其一');
         return;
       }
       if (!form.value.deadline) {
@@ -188,14 +207,15 @@ const handlePublish = async () => {
       
       isSubmitting.value = true;
       try {
-        // 写入 Pinia（本地模拟创建竞赛）
-        competitionStore.addCompetition({
+        // 写入 Pinia（本地模拟创建竞赛并持久化）
+        competitionStore.addLocalCompetition({
           id: Date.now(),
-          title: form.value.title,
-          description: form.value.content, // 使用富文本作为描述
-          publishTime: new Date().toISOString().slice(0, 10),
-          deadline: form.value.deadline,
-          createdBy: userStore.username || 'admin',
+          name: form.value.title,
+          summary: form.value.summary || (form.value.content ? form.value.content.substring(0, 200) : ''),
+          content: form.value.content || '', // 富文本可选，后端未接入时可为空
+          startTime: form.value.startTime || new Date().toISOString().slice(0, 10),
+          endTime: form.value.deadline,
+          creatorId: userStore.username || 'admin',
           maxMembers: form.value.maxMembers
         })
         ElMessage.success('已创建本地竞赛');
@@ -224,7 +244,9 @@ const handleReset = () => {
      quillEditorRef.value.setHTML('');
   }
   // 重置默认值
-  form.value.maxMembers = 3;
+    form.value.maxMembers = 3;
+    form.value.summary = '';
+    form.value.startTime = '';
 };
 </script>
 

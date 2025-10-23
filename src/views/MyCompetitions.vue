@@ -3,7 +3,7 @@
     <h2>我的竞赛</h2>
     <el-table :data="myTeams" border style="width: 100%">
       <el-table-column prop="competitionTitle" label="竞赛名称" />
-      <el-table-column prop="teamName" label="我的队伍" />
+    <el-table-column prop="teamName" label="我的队伍" />
       <el-table-column label="角色" width="120">
         <template #default="{ row }">{{ row.isLeader ? '队长' : '队员' }}</template>
       </el-table-column>
@@ -46,12 +46,12 @@ const myTeams = computed(() => {
   return teamStore.teams
     .filter(t => t.leaderId === username || (t.members || []).some(m => m.userId === username))
     .map(t => {
-      const comp = competitionStore.competitions.find(c => c.id == t.competitionId)
+      const comp = competitionStore.competitions.find(c => c.id == t.compId)
       return {
-        competitionId: t.competitionId,
-        competitionTitle: comp?.title || '未知竞赛',
+        competitionId: t.compId,
+        competitionTitle: comp?.name || '未知竞赛',
         teamId: t.id,
-        teamName: t.teamName,
+        teamName: t.name,
         isLeader: t.leaderId === username
       }
     })

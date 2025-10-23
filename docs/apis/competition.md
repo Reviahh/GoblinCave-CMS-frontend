@@ -1,22 +1,16 @@
-# 竞赛模块 API（草案）
+# 竞赛模块 API
 
-> 根据后端 SQL 与页面场景先给出骨架，字段/签名以后端实现为准。
-
-## 数据模型（建议）
-```ts
+## 数据模型
+```js
 interface Competition {
   id: number
-  compName: string
-  category?: string
-  organizer?: string
-  description?: string
-  startTime?: string // ISO
-  endTime?: string   // ISO
-  isTeam: 0 | 1
-  maxTeamSize: number
-  createUserId?: number
-  createTime?: string
-  updateTime?: string
+  name: string
+  summary?: string
+  content: string
+  startTime: string // ISO
+  endTime: string   // ISO
+  maxMembers: number
+  creatorId?: string
 }
 ```
 
@@ -49,13 +43,3 @@ interface Competition {
   - body: { compId?, title, content }
   - resp: BaseResponse<number>
 
-```ts
-interface Announcement {
-  id: number
-  compId?: number
-  title: string
-  content: string
-  userId?: number
-  createTime?: string
-}
-```

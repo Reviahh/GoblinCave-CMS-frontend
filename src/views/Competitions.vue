@@ -3,13 +3,17 @@
     <h2>学科竞赛列表</h2>
 
     <el-table :data="competitionStore.competitions" border style="width: 100%">
-      <el-table-column prop="title" label="竞赛名称" />
-      <el-table-column prop="description" label="简介" />
-      <el-table-column prop="deadline" label="截止时间" />
+      <el-table-column label="竞赛名称">
+        <template #default="{ row }">
+          <a @click.prevent="goDetail(row.id)" href="#">{{ row.name }}</a>
+        </template>
+      </el-table-column>
+      <el-table-column prop="summary" label="简介" />
+      <el-table-column prop="endTime" label="截止时间" />
       <el-table-column label="操作" width="300">
         <template #default="{ row }">
           <!-- 管理员：管理队伍/编辑竞赛 -->
-          <template v-if="userStore.role === 'admin'">
+          <template v-if="userStore.role === 'admin' || userStore.role === 1 || userStore.role === '1'">
             <el-button type="primary" size="small" @click="goDetail(row.id)">
               管理/详情
             </el-button>
@@ -28,8 +32,9 @@
       </el-table-column>
     </el-table>
 
-    <!-- 空列表提示 -->
-    <el-empty description="暂无竞赛" v-if="competitionStore.competitions.length === 0" />
+    <!-- 空/加载提示 -->
+    <div v-if="loading" style="text-align:center;padding:18px">加载中...</div>
+    <el-empty description="暂无竞赛" v-else-if="competitionStore.competitions.length === 0" />
   </div>
   
 </template>
@@ -46,13 +51,35 @@
 </style>
 
 <script setup>
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCompetitionStore } from '@/stores/competition'
 import { useUserStore } from '@/stores/user'
 
+function isUrl(str) {
+  if (!str) return false
+  try { return ['http:', 'https:'].includes(new URL(str).protocol) } catch (e) { return false }
+}
+
+function stripHtml(input) {
+  if (!input) return ''
+  return input.replace(/<[^>]*>/g, '')
+}
+
+function previewText(input, length = 120) {
+  const text = stripHtml(input)
+  return text.length > length ? text.slice(0, length) + '...' : text
+}
+
 const router = useRouter()
 const competitionStore = useCompetitionStore()
 const userStore = useUserStore()
+const loading = ref(false)
+
+onMounted(() => {
+  loading.value = true
+  competitionStore.fetchList().catch(() => {}).finally(() => { loading.value = false })
+})
 
 function goDetail(id) {
   router.push(`/competitions/${id}`)

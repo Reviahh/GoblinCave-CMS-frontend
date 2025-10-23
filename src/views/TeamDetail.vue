@@ -7,7 +7,7 @@
 
     <el-form v-if="team" label-width="100px" :model="teamEdit">
       <el-form-item label="队伍名称">
-        <el-input v-model="teamEdit.teamName" />
+        <el-input v-model="teamEdit.name" />
       </el-form-item>
       <el-form-item label="队长">
         <el-input v-model="teamEdit.leaderId" disabled />
@@ -62,12 +62,12 @@ const competitionStore = useCompetitionStore()
 
 const teamId = Number(route.query.teamId)
 const team = teamStore.teams.find(t => t.id === teamId)
-const comp = team ? competitionStore.competitions.find(c => c.id == team.competitionId) : null
+const comp = team ? competitionStore.competitions.find(c => c.id == team.compId) : null
 
 const teamEdit = reactive(team ? {
   id: team.id,
-  competitionId: team.competitionId,
-  teamName: team.teamName,
+  compId: team.compId,
+  name: team.name,
   leaderId: team.leaderId,
   members: team.members ? team.members.map(m => ({ ...m })) : []
 } : {})
@@ -85,7 +85,7 @@ function removeMember(idx) {
 }
 function save() {
   teamStore.updateTeam(teamEdit.id, {
-    teamName: teamEdit.teamName,
+    name: teamEdit.name,
     members: teamEdit.members
   })
   router.back()

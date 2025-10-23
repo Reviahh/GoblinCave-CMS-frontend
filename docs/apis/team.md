@@ -1,23 +1,13 @@
-# 队伍模块 API（草案）
+# 队伍模块 API
 
-## 数据模型（建议）
-```ts
+## 数据模型
+```js
 interface Team {
   id: number
-  compId: number
+  compId: string
   name: string
-  description?: string
-  maxNum: number
-  expireTime?: string
-  userId?: number // 队长
-  status: 0 | 1 | 2 // 公开/私有/加密
-}
-
-interface UserTeam {
-  id: number
-  userId: number
-  teamId: number
-  joinTime?: string
+  leaderId: string // 队长
+  members: [{ userId }]
 }
 ```
 

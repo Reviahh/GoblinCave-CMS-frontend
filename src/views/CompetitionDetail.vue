@@ -1,8 +1,13 @@
 <template>
   <div class="competition-detail">
-    <h2>{{ competition.title }}</h2>
-    <p>{{ competition.description }}</p>
-  <p>人数上限：{{ competition.maxMembers ?? 5 }}</p>
+    <h2>{{ competition.name }}</h2>
+    <!-- content 优先，如果 content 是 URL 则显示链接，否则当作 HTML 内容渲染 -->
+    <div v-if="competition.content && isUrl(competition.content)">
+      <p>内容链接：<a :href="competition.content" target="_blank">打开</a></p>
+    </div>
+    <div v-else-if="competition.content" class="competition-content" v-html="competition.content"></div>
+    <p v-else>{{ competition.summary }}</p>
+    <p>人数上限：{{ competition.maxMembers ?? 5 }}</p>
 
     <!-- 学生视角 -->
     <div v-if="userStore.role === 'student'" class="student-section">
@@ -46,7 +51,7 @@
       <div v-if="isSingle">
         <el-form :model="teamForm" label-width="100px">
           <el-form-item label="队伍名称">
-            <el-input v-model="teamForm.teamName" placeholder="请输入队伍名称" />
+            <el-input v-model="teamForm.name" placeholder="请输入队伍名称" />
           </el-form-item>
           <el-form-item label="队长">
             <el-input v-model="teamForm.leaderId" disabled />
@@ -62,7 +67,7 @@
         <el-form :model="teamForm" label-width="100px">
           <!-- 队伍名称 -->
           <el-form-item label="队伍名称">
-            <el-input v-model="teamForm.teamName" placeholder="请输入队伍名称" />
+            <el-input v-model="teamForm.name" placeholder="请输入队伍名称" />
           </el-form-item>
 
           <!-- 队长（自动填充，不可编辑） -->
@@ -111,7 +116,7 @@
           <el-alert type="info" show-icon :closable="false" title="你已在该竞赛的队伍中">
             <template #default>
               <div style="margin-top: 6px">
-                当前队伍：{{ myTeam.teamName }}
+                当前队伍：{{ myTeam.name }}
                 <el-button type="primary" link @click="goTeamDetail(myTeam.id)">管理我的队伍</el-button>
               </div>
             </template>
@@ -123,7 +128,7 @@
               <el-option
                 v-for="t in availableTeams"
                 :key="t.id"
-                :label="t.teamName + capacityText(t)"
+                :label="t.name + capacityText(t)"
                 :value="t.id"
               />
             </el-select>
@@ -149,11 +154,14 @@
       <!-- 编辑竞赛信息 -->
       <el-form :model="competition" label-width="100px">
         <el-form-item label="标题">
-          <el-input v-model="competition.title" />
+          <el-input v-model="competition.name" />
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="competition.description" />
-        </el-form-item>
+          <el-form-item label="描述">
+            <el-input v-model="competition.summary" />
+          </el-form-item>
+          <el-form-item label="内容 URL">
+            <el-input v-model="competition.content" placeholder="请输入内容链接（例如：https://...）" />
+          </el-form-item>
         <el-form-item label="人数限制">
           <el-input-number v-model="competition.maxMembers" :min="1" />
         </el-form-item>
@@ -164,8 +172,8 @@
 
       <!-- 队伍管理 -->
       <h3>队伍列表</h3>
-      <el-table :data="teamStore.teams.filter(t => t.competitionId === competition.id)" border>
-        <el-table-column prop="teamName" label="队伍名称" />
+  <el-table :data="teamStore.teams.filter(t => t.compId === competition.id)" border>
+  <el-table-column prop="name" label="队伍名称" />
         <el-table-column prop="leaderId" label="队长" />
         <el-table-column label="成员">
           <template #default="{ row }">
@@ -191,6 +199,7 @@ import { useUserStore } from '@/stores/user'
 import { useCompetitionStore } from '@/stores/competition'
 import { useTeamStore } from '@/stores/team'
 import { useChatStore } from '@/stores/chat'
+import { onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -203,11 +212,19 @@ const chatStore = useChatStore()
 const competition = ref(
   competitionStore.competitions.find(c => c.id == route.params.id) || {
     id: Date.now(),
-    title: '未找到',
-    description: '',
+    name: '未找到',
+    summary: '',
     maxMembers: 5
   }
 )
+
+onMounted(async () => {
+  const id = route.params.id
+  if (id) {
+    const data = await competitionStore.fetchCompetition(Number(id))
+    if (data) competition.value = data
+  }
+})
 
 // 模式：create（报名-队长）或 join（参加-队员）
 const mode = ref(route.query.mode === 'join' ? 'join' : 'create')
@@ -216,7 +233,7 @@ const isSingle = computed(() => (competition.value.maxMembers ?? 5) === 1)
 
 // 学生报名表单
 const teamForm = ref({
-  teamName: '',
+  name: '',
   leaderId: userStore.username, // 队长自动填充
   members: [] // 队员手动输入
 })
@@ -228,7 +245,7 @@ const postsForCompetition = computed(() =>
 
 // 本竞赛的队伍
 const teamsInCompetition = computed(() =>
-  teamStore.teams.filter(t => t.competitionId == competition.value.id)
+  teamStore.teams.filter(t => t.compId == competition.value.id)
 )
 
 // 可加入队伍（未满员）
@@ -262,7 +279,7 @@ function removeMember(index) {
 function submitTeam() {
   // 已报名校验（同一竞赛只能在一个队伍中）
   const exists = teamStore.teams.some(t =>
-    t.competitionId == competition.value.id && (t.leaderId === userStore.username || (t.members || []).some(m => m.userId === userStore.username))
+    t.compId == competition.value.id && (t.leaderId === userStore.username || (t.members || []).some(m => m.userId === userStore.username))
   )
   if (exists) {
     ElMessage.info('你已在该竞赛的队伍中')
@@ -270,8 +287,8 @@ function submitTeam() {
   }
   teamStore.addTeam({
     id: Date.now(),
-    competitionId: competition.value.id,
-    teamName: teamForm.value.teamName,
+    compId: competition.value.id,
+    name: teamForm.value.name,
     leaderId: teamForm.value.leaderId,
     members: teamForm.value.members
   })
@@ -305,8 +322,8 @@ function joinTeam() {
 // 管理员更新竞赛
 function updateCompetition() {
   competitionStore.updateCompetition(competition.value.id, {
-    title: competition.value.title,
-    description: competition.value.description,
+    name: competition.value.name,
+    summary: competition.value.summary,
     maxMembers: competition.value.maxMembers
   })
   ElMessage.success('竞赛信息已更新')
@@ -332,6 +349,17 @@ function goSeek() {
 
 function goChat(postId) {
   router.push({ path: '/chat', query: { postId } })
+}
+
+// 简单的 URL 校验
+function isUrl(str) {
+  if (!str) return false
+  try {
+    const u = new URL(str)
+    return ['http:', 'https:'].includes(u.protocol)
+  } catch (e) {
+    return false
+  }
 }
 </script>
 

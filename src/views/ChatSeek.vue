@@ -6,8 +6,8 @@
         <el-input v-model="form.title" placeholder="例如：数学建模招募一位写作同学" />
       </el-form-item>
       <el-form-item label="竞赛">
-        <el-select v-model="form.competitionId" placeholder="选择关联竞赛" style="width: 260px">
-          <el-option v-for="c in competitionStore.competitions" :key="c.id" :label="c.title" :value="c.id" />
+          <el-select v-model="form.competitionId" placeholder="选择关联竞赛" style="width: 260px">
+          <el-option v-for="c in competitionStore.competitions" :key="c.id" :label="c.name" :value="c.id" />
         </el-select>
       </el-form-item>
       <el-form-item label="方向">
@@ -44,9 +44,9 @@
     <el-table :data="filteredPosts" border>
       <el-table-column prop="title" label="标题" />
       <el-table-column prop="author" label="发布人" width="120" />
-      <el-table-column label="竞赛">
+          <el-table-column label="竞赛">
         <template #default="{ row }">
-          {{ competitionStore.competitions.find(c => c.id == row.competitionId)?.title || '未关联' }}
+          {{ competitionStore.competitions.find(c => c.id == row.competitionId)?.name || '未关联' }}
         </template>
       </el-table-column>
       <el-table-column label="方向" width="200">
